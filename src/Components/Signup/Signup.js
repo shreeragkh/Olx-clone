@@ -19,6 +19,7 @@ export default function Signup() {
       let userCredentaials = await createUserWithEmailAndPassword(auth, email, Password)
       let user = userCredentaials.user
       await updateProfile(user, {displayName: Username})
+      console.log("User created successfully")  // To identify the user is created
     }
     catch(error){
       const errorCode = error.code;
