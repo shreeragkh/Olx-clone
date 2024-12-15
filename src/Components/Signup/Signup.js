@@ -1,25 +1,71 @@
-import React ,{useState,useContext} from 'react';
+import React ,{useState} from 'react';
 import {  createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import Logo from '../../olx-logo.png';
 import './Signup.css';
-import { Firebasecontex } from '../../store/firebaseContext';
-import { auth } from '../../api';
+// import { Firebasecontex } from '../../store/firebaseContext';
+import { auth,db } from '../../api';
+import { addDoc,collection,serverTimestamp } from 'firebase/firestore';
+import {  useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [Username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [Phonenumber, setPhonenumber] = useState('')
   const [Password, setPassword] = useState('')
-  // const {auth} = useContext(Firebasecontex)
+  const [Error, setError] = useState('')  // const {auth} = useContext(Firebasecontex)
+  const [PasswordError, setPasswordError] = useState()
+  const history=useNavigate()
+
+  const validatePassword=(Password)=>{
+    const minLength = 8;
+    const upperCase = /[A-Z]/;
+    const lowerCase = /[a-z]/;
+    const number = /[0-9]/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if(Password.length<minLength){
+      return "Password should contain minimum 8 Letters"
+    }
+    if(!upperCase.test(Password)){
+      return "Password should contain atleast 1 Uppercase"
+    }
+    if(!lowerCase.test(Password)){
+      return "Password should contain atleast 1 Lowercase"
+    }
+    if(!number.test(Password)){
+      return "Password should contain atleast 1 Number"
+    }
+    if(!specialChar.test(Password)){
+      return "Password should contain atleast 1 Special Character"
+    }
+    return ''
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Your sign-up logic here
+    if (!Username || !email || !Phonenumber || !Password) {
+      setError('All fields are required');
+      return;
+    }
+    const passwordValidationerror=validatePassword(Password)
+      if (passwordValidationerror){
+        setPasswordError(passwordValidationerror)
+      }
     try{
       let userCredentaials = await createUserWithEmailAndPassword(auth, email, Password)
       let user = userCredentaials.user
       await updateProfile(user, {displayName: Username})
-      console.log("User created successfully")  // To identify the user is created
+      await addDoc(collection(db, "users"), {
+        id: user.uid,
+        user: Username,
+        phone: Phonenumber,
+        email:email,
+        password:Password,
+        time:serverTimestamp()
+      })
+      history('/login')
+      // console.log("User created successfully")  // To identify the user is created
     }
     catch(error){
       const errorCode = error.code;
@@ -44,7 +90,6 @@ export default function Signup() {
             onChange={(e) => setUsername(e.target.value)}
             id="fname"
             name="name"
-            defaultValue="John"
           />
           <br />
           <label htmlFor="fname">Email</label>
@@ -56,7 +101,6 @@ export default function Signup() {
             onChange={(e) => setEmail(e.target.value)}
             id="fname"
             name="email"
-            defaultValue="John"
           />
           <br />
           <label htmlFor="lname">Phone</label>
@@ -68,7 +112,6 @@ export default function Signup() {
             onChange={(e) => setPhonenumber(e.target.value)}
             id="lname"
             name="phone"
-            defaultValue="Doe"
           />
           <br />
           <label htmlFor="lname">Password</label>
@@ -80,9 +123,9 @@ export default function Signup() {
             onChange={(e) => setPassword(e.target.value)}
             id="lname"
             name="password"
-            defaultValue="Doe"
           />
           <br />
+          {PasswordError && <p style={{ color: 'red' }}>{PasswordError}</p>} {/* Show password error message */}
           <br />
           <button>Signup</button>
         </form>
