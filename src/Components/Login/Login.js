@@ -12,7 +12,6 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(''); // Clear any previous error
-
     try {
       await signInWithEmailAndPassword(auth, Email, Password);
       alert('Logged in successfully!');
@@ -23,16 +22,16 @@ function Login() {
       // Handle specific Firebase error codes
       if (errorCode === 'auth/user-not-found') {
         setError('No user found with this email. Please check the email or sign up.');
-      } else if (errorCode === 'auth/wrong-password') {
+      } 
+      if (errorCode === 'auth/wrong-password') {
         setError('Incorrect password. Please try again.');
-      } else if (errorCode === 'auth/invalid-email') {
+      } 
+      if (errorCode === 'auth/invalid-email') {
         setError('The email address is invalid.');
-        
-      } else if(errorCode==='auth/invalid-credential') {
+        } 
+      if(errorCode==='auth/invalid-credential') {
         setError('Invlid credentials. Please check the email or sign up.');
-      } else {
-        setError('An error occurred. Please try again later.'); // Generic fallback message
-      }
+        }
     }
   };
 
