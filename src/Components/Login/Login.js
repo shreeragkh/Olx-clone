@@ -3,18 +3,20 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../../api';
 import Logo from '../../olx-logo.png';
 import './Login.css';
+import {  useNavigate } from 'react-router-dom';
 
 function Login() {
   const [Password, setPassword] = useState('');
   const [Email, setEmail] = useState('');
   const [Error, setError] = useState('');
+  const history=useNavigate()
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(''); // Clear any previous error
     try {
       await signInWithEmailAndPassword(auth, Email, Password);
-      alert('Logged in successfully!');
+      history('/')
     } catch (error) {
       const errorCode = error.code;
       console.log(errorCode)

@@ -5,7 +5,7 @@ import './Signup.css';
 // import { Firebasecontex } from '../../store/firebaseContext';
 import { auth,db } from '../../api';
 import { addDoc,collection,serverTimestamp } from 'firebase/firestore';
-import {  useNavigate } from 'react-router-dom';
+import {  Link, useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [Username, setUsername] = useState('')
@@ -23,6 +23,9 @@ export default function Signup() {
     const number = /[0-9]/;
     const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
 
+    if (!Password) {
+      return "Password is Required"
+    }
     if(Password.length<minLength){
       return "Password should contain minimum 8 Letters"
     }
@@ -63,9 +66,9 @@ export default function Signup() {
         email:email,
         password:Password,
         time:serverTimestamp()
-      })
+      }
+    )
       history('/login')
-      // console.log("User created successfully")  // To identify the user is created
     }
     catch(error){
       const errorCode = error.code;
@@ -79,7 +82,7 @@ export default function Signup() {
   return (
     <div>
       <div className="signupParentDiv">
-        <img width="200px" height="200px" src={Logo}></img>
+        <img width="200px" height="200px" src={Logo} alt='logo'></img>
         <form onSubmit={handleSubmit}>
           <label htmlFor="fname">Username</label>
           <br />
@@ -126,10 +129,11 @@ export default function Signup() {
           />
           <br />
           {PasswordError && <p style={{ color: 'red' }}>{PasswordError}</p>} {/* Show password error message */}
+          {Error && <p style={{ color: 'red' }}>{Error}</p>}
           <br />
           <button>Signup</button>
         </form>
-        <a>Login</a>
+        <Link to='/login'>Login</Link>
       </div>
     </div>
   );
