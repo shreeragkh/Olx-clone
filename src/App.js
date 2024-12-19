@@ -7,6 +7,10 @@ import LoginPage from './Pages/Login';
 import { AuthContext } from './store/firebaseContext';
 import {auth} from'./api'
 import { onAuthStateChanged } from 'firebase/auth';
+import Create from './Pages/Create'
+import View from './Pages/ViewPost'
+import Post_function from './store/postContext';
+
 
 function App() {
   const {setUser} = useContext(AuthContext)
@@ -18,13 +22,17 @@ function App() {
   
   return (
     <div className="App">
+      <Post_function>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/create" element={<Create/>} />
+          <Route path="/view/:id" element={<View/>} />
         </Routes>
       </Router>
+    </Post_function>
     </div>
   );
 }
