@@ -8,35 +8,44 @@ import { useState } from 'react';
 import { db } from '../../api';
 import { collection, query, getDocs, where, onSnapshot } from "firebase/firestore";
 import { useParams } from 'react-router-dom';
+import { doc, getDoc } from "firebase/firestore";
 
 
 function View() {
-  const id=useParams('id')
-  const [userdetails, setuserdetails] = useState()
+  const { id } = useParams();
+  const [userDetails, setUserDetails] = useState(null);
+  const [productDetails, setProductDetails] = useState(null);
   // const {postDetails} = useContext(PostDetailsContext)
   // const {id} =postDetails
   console.log(id)
   useEffect(() => {
-    
-    console.log(id)
-    const collectionRef = collection(db, "Products");
-    const q = query(collectionRef, where("id", "==", "KPKYBkIIUuUmkYSr3JiuRpzSuUE3"));
-    onSnapshot(q, (snapshot) => {
-      let tempArray = [];
-      snapshot.docs.forEach((doc) => {
-        tempArray.push({ ...doc.data(), id: doc.id });
-      });
-      if (tempArray.length > 0) {
-        setuserdetails(tempArray[0]);
+    const fetchProductAndUserDetails = async () => {
+      if (!id) {
+        console.log("No product id provided for fetching product details");
+        return;
       }
-    });
- }, [])
+      try {
+        // Fetch product details
+        const productDocRef = doc(db, "Products", id);
+        const productDoc = await getDoc(productDocRef);
+        if (productDoc.exists()) {
+          const productData = productDoc.data();
+          console.log(productData)
+          setProductDetails(productData);
+          const userId = productData.userId;
+          // console.log(userId)
+        } else {
+          console.log("No product found for the provided id");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchProductAndUserDetails();
+  }, [id]);
+
   
- useEffect(() => {
-   console.log(userdetails)
- 
-   
- }, [userdetails])
  
   
 //   useEffect( ()=>{
